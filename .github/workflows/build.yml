@@ -1,0 +1,72 @@
+name: Build LiquidGlassBar
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  rootful:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Theos
+        run: |
+          export THEOS=~/theos
+          git clone --recursive https://github.com/theos/theos.git "$THEOS"
+          git clone --depth=1 -n https://github.com/theos/sdks.git /tmp/sdks
+          cd /tmp/sdks && git sparse-checkout set iPhoneOS16.5.sdk && git checkout
+          cp -r /tmp/sdks/iPhoneOS16.5.sdk "$THEOS/sdks/"
+      - name: Install ldid
+        run: brew install ldid
+      - name: Build (rootful)
+        run: |
+          export THEOS=~/theos
+          make package FINALPACKAGE=1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LiquidGlassBar-rootful
+          path: packages/*.deb
+
+  rootless:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Theos
+        run: |
+          export THEOS=~/theos
+          git clone --recursive https://github.com/theos/theos.git "$THEOS"
+          git clone --depth=1 -n https://github.com/theos/sdks.git /tmp/sdks
+          cd /tmp/sdks && git sparse-checkout set iPhoneOS16.5.sdk && git checkout
+          cp -r /tmp/sdks/iPhoneOS16.5.sdk "$THEOS/sdks/"
+      - name: Install ldid
+        run: brew install ldid
+      - name: Build (rootless)
+        run: |
+          export THEOS=~/theos
+          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LiquidGlassBar-rootless
+          path: packages/*.deb
+
+  roothide:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Theos (RootHide fork)
+        run: |
+          export THEOS=~/theos
+          git clone --recursive https://github.com/roothide/theos.git "$THEOS"
+          git clone --depth=1 -n https://github.com/theos/sdks.git /tmp/sdks
+          cd /tmp/sdks && git sparse-checkout set iPhoneOS16.5.sdk && git checkout
+          cp -r /tmp/sdks/iPhoneOS16.5.sdk "$THEOS/sdks/"
+      - name: Install ldid
+        run: brew install ldid
+      - name: Build (roothide)
+        run: |
+          export THEOS=~/theos
+          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=roothide
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LiquidGlassBar-roothide
+          path: packages/*.deb

@@ -1,15 +1,8 @@
-# LiquidGlassBar 1.4.0
+# LiquidGlassBar 1.5.0
 
 Thanh tab bar kiểu **Liquid Glass trong suốt cho Messenger** (iOS 15 – 16+, hỗ trợ Rootful / Rootless / RootHide).
 
-## Điểm mới ở bản 1.4.0
-- **Kính tối trong suốt & khúc xạ nền:** Sử dụng `UIBlurEffectStyleSystemUltraThinMaterialDark` kết hợp viền sáng specular mỏng, đồng thời mở rộng khung danh sách chat chạy xuyên xuống dưới thanh bar để nhìn xuyên qua và thấy hiệu ứng làm mờ nội dung khi cuộn hoặc lướt glass.
-- **Ôm trọn cả icon lẫn chữ:** Tự động mở rộng chiều cao viên thuốc nền (`60pt`) và căn tâm chuẩn theo cột tab, loại trừ hoàn toàn cục thông báo đỏ (`30+`) khỏi phép đo kích thước để không bị lệch.
-- **Kéo trượt mượt & chuyển tab đồng bộ:** Khóa xung đột cập nhật layout trong lúc lò xo thả tay, hỗ trợ cả `UITabBar` chuẩn lẫn thanh tab tự chế của Messenger.
-- **Ăn thông số tức thì:** Đồng bộ `CFPreferencesAppSynchronize` ngay lập tức khi đổi màu, kích thước hoặc độ nảy trong Cài đặt.
-- **Khung Preview tương tác trực tiếp:** Có thể chạm và kéo thử cục glass ngay trong trang Cài đặt.
-
-## Cấu trúc thư mục
-- `.github/workflows/build.yml`: Workflow GitHub Actions biên dịch 3 bản `rootful`, `rootless`, `roothide`.
-- `tweak/`: Mã nguồn tweak (`Tweak.x`, `Makefile`, `LiquidGlassBar.plist`).
-- `prefs/`: Bundle Cài đặt (`LGCRootListController`, `LGCPreviewCell`, `LGCColorCell`, `entry.plist`, `Resources/Root.plist`, `Resources/Info.plist`).
+## Điểm mới ở bản 1.5.0
+- **Sửa lỗi không hiện trong Cài đặt:** Liên kết chuẩn `Preferences.framework` trong `prefs/Makefile`, khai báo `preferenceloader` trong `control` và đóng gói chuẩn `entry.plist` cho cả Rootful / Rootless / RootHide.
+- **Vuốt trượt mượt mà, hết khựng giật:** Thay thế lớp blur lồng nhau gây nghẽn GPU bằng thấu kính khúc xạ specular thuần CoreAnimation kết hợp `UIPanGestureRecognizer` làm mượt vận tốc, giúp glass trượt êm và nảy tự nhiên sang tab kế tiếp.
+- **Tỷ lệ viên thuốc thon gọn chuẩn iOS 26:** Viên thuốc nền cao `52pt` với lề ngang `16pt`, cục glass chọn rộng `82%` và cao `84%` ôm trọn cả icon lẫn chữ với khoảng thoáng cân đối.

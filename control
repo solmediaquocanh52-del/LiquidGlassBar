@@ -1,9 +1,9 @@
 Package: com.vn.liquidglassbar
 Name: LiquidGlassBar
-Version: 1.4.0
+Version: 1.5.0
 Architecture: iphoneos-arm
-Description: Thanh tab bar kiểu Liquid Glass trong suốt cho Messenger: nền kính mờ dạng viên thuốc nổi, kéo cục glass trượt ngang qua lại để chọn mục, icon và chữ mục được chọn đổi sang màu tuỳ chọn trong Cài đặt.
+Description: Thanh tab bar kiểu Liquid Glass trong suốt cho Messenger: nền kính mờ dạng viên thuốc nổi gọn gàng, vuốt cục glass trượt mượt 120Hz để chọn mục, tuỳ chỉnh đầy đủ trong Cài đặt.
 Maintainer: Quoc
 Author: Quoc
 Section: Tweaks
-Depends: mobilesubstrate
+Depends: mobilesubstrate, preferenceloader

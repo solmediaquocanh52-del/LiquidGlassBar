@@ -12,7 +12,7 @@
 			<key>label</key>
 			<string>XEM TRƯỚC TRỰC QUAN (TƯƠNG TÁC TRỰC TIẾP)</string>
 			<key>footerText</key>
-			<string>Chạm hoặc kéo ngang trực tiếp trên khung mô phỏng để thử độ rộng, chiều cao, độ giãn dẻo và độ nảy lò xo. Mọi chỉnh sửa dưới đây áp dụng ngay vào Messenger.</string>
+			<string>Vuốt ngang hoặc chạm trực tiếp trên khung mô phỏng để thử độ mượt, độ giãn và độ nảy lò xo. Mọi thay đổi áp dụng ngay sang Messenger.</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -20,7 +20,7 @@
 			<key>cellClass</key>
 			<string>LGCPreviewCell</string>
 			<key>height</key>
-			<real>152</real>
+			<real>144</real>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -91,8 +91,6 @@
 			<string>PSGroupCell</string>
 			<key>label</key>
 			<string>ĐỘ TRONG SUỐT &amp; KHÚC XẠ KÍNH</string>
-			<key>footerText</key>
-			<string>Mở rộng danh sách chat chạy dưới thanh bar giúp nhìn xuyên qua và thấy hiệu ứng làm mờ tin nhắn phía sau giống kính thật.</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -118,13 +116,13 @@
 			<key>cell</key>
 			<string>PSSliderCell</string>
 			<key>default</key>
-			<real>0.92</real>
+			<real>0.95</real>
 			<key>defaults</key>
 			<string>com.vn.liquidglassbar</string>
 			<key>key</key>
 			<string>blobAlpha</string>
 			<key>label</key>
-			<string>Độ rõ cục glass chọn</string>
+			<string>Độ rõ thấu kính chọn</string>
 			<key>min</key>
 			<real>0.2</real>
 			<key>max</key>
@@ -152,15 +150,15 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
-			<string>KÍCH THƯỚC &amp; VỊ TRÍ CỤC GLASS</string>
+			<string>KÍCH THƯỚC &amp; TỶ LỆ VIÊN THUỐC</string>
 			<key>footerText</key>
-			<string>Điều chỉnh chiều rộng (ngang), chiều cao (dài/ngắn) của cục glass và độ cao viên thuốc nền sao cho ôm trọn cả icon lẫn chữ.</string>
+			<string>Tỷ lệ chuẩn iOS 26: cao 52pt, lề ngang 16pt, cục glass rộng 82% và cao 84% để ôm trọn icon lẫn chữ mà vẫn gọn gàng.</string>
 		</dict>
 		<dict>
 			<key>cell</key>
 			<string>PSSliderCell</string>
 			<key>default</key>
-			<real>104</real>
+			<real>82</real>
 			<key>defaults</key>
 			<string>com.vn.liquidglassbar</string>
 			<key>key</key>
@@ -168,9 +166,9 @@
 			<key>label</key>
 			<string>Chiều rộng cục glass (%)</string>
 			<key>min</key>
-			<real>65</real>
+			<real>55</real>
 			<key>max</key>
-			<real>135</real>
+			<real>115</real>
 			<key>showValue</key>
 			<true/>
 			<key>PostNotification</key>
@@ -180,7 +178,7 @@
 			<key>cell</key>
 			<string>PSSliderCell</string>
 			<key>default</key>
-			<real>92</real>
+			<real>84</real>
 			<key>defaults</key>
 			<string>com.vn.liquidglassbar</string>
 			<key>key</key>
@@ -188,9 +186,9 @@
 			<key>label</key>
 			<string>Chiều cao cục glass (%)</string>
 			<key>min</key>
-			<real>65</real>
+			<real>60</real>
 			<key>max</key>
-			<real>120</real>
+			<real>105</real>
 			<key>showValue</key>
 			<true/>
 			<key>PostNotification</key>
@@ -200,7 +198,7 @@
 			<key>cell</key>
 			<string>PSSliderCell</string>
 			<key>default</key>
-			<real>60</real>
+			<real>52</real>
 			<key>defaults</key>
 			<string>com.vn.liquidglassbar</string>
 			<key>key</key>
@@ -208,9 +206,9 @@
 			<key>label</key>
 			<string>Chiều cao viên thuốc nền (pt)</string>
 			<key>min</key>
-			<real>48</real>
+			<real>40</real>
 			<key>max</key>
-			<real>72</real>
+			<real>68</real>
 			<key>showValue</key>
 			<true/>
 			<key>PostNotification</key>
@@ -220,7 +218,7 @@
 			<key>cell</key>
 			<string>PSSliderCell</string>
 			<key>default</key>
-			<real>10</real>
+			<real>16</real>
 			<key>defaults</key>
 			<string>com.vn.liquidglassbar</string>
 			<key>key</key>
@@ -228,9 +226,9 @@
 			<key>label</key>
 			<string>Lề ngang hai bên nền (pt)</string>
 			<key>min</key>
-			<real>0</real>
+			<real>4</real>
 			<key>max</key>
-			<real>24</real>
+			<real>36</real>
 			<key>showValue</key>
 			<true/>
 			<key>PostNotification</key>
@@ -260,7 +258,7 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
-			<string>CẢM GIÁC CHẠM, KÉO &amp; ĐỘ NẢY</string>
+			<string>CẢM GIÁC VUỐT, KÉO &amp; ĐỘ NẢY</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -272,7 +270,7 @@
 			<key>key</key>
 			<string>dragEnabled</string>
 			<key>label</key>
-			<string>Cho kéo glass để chọn mục</string>
+			<string>Cho vuốt glass để chọn mục</string>
 			<key>PostNotification</key>
 			<string>com.vn.liquidglassbar/prefsChanged</string>
 		</dict>
@@ -294,7 +292,7 @@
 			<key>cell</key>
 			<string>PSSliderCell</string>
 			<key>default</key>
-			<real>60</real>
+			<real>55</real>
 			<key>defaults</key>
 			<string>com.vn.liquidglassbar</string>
 			<key>key</key>
@@ -314,13 +312,13 @@
 			<key>cell</key>
 			<string>PSSliderCell</string>
 			<key>default</key>
-			<real>65</real>
+			<real>50</real>
 			<key>defaults</key>
 			<string>com.vn.liquidglassbar</string>
 			<key>key</key>
 			<string>stretchPct</string>
 			<key>label</key>
-			<string>Độ giãn dẻo khi kéo nhanh (%)</string>
+			<string>Độ giãn dẻo khi vuốt nhanh (%)</string>
 			<key>min</key>
 			<real>0</real>
 			<key>max</key>
@@ -334,13 +332,13 @@
 			<key>cell</key>
 			<string>PSSliderCell</string>
 			<key>default</key>
-			<real>105</real>
+			<real>104</real>
 			<key>defaults</key>
 			<string>com.vn.liquidglassbar</string>
 			<key>key</key>
 			<string>touchScalePct</string>
 			<key>label</key>
-			<string>Độ phồng nhẹ khi chạm kéo (%)</string>
+			<string>Độ phồng nhẹ khi vuốt (%)</string>
 			<key>min</key>
 			<real>100</real>
 			<key>max</key>
@@ -390,7 +388,7 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>footerText</key>
-			<string>LiquidGlassBar 1.4.0 — made by Quoc.</string>
+			<string>LiquidGlassBar 1.5.0 — made by Quoc.</string>
 		</dict>
 	</array>
 </dict>

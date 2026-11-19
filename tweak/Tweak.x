@@ -1,5 +1,6 @@
-// LiquidGlassBar 1.4.0 — Thanh tab bar kiểu Liquid Glass cho Messenger
+// LiquidGlassBar 1.5.0 — Thanh tab bar kiểu Liquid Glass cho Messenger
 #import <UIKit/UIKit.h>
+#import <QuartzCore/QuartzCore.h>
 #import <objc/runtime.h>
 #import <objc/message.h>
 
@@ -20,7 +21,6 @@ static NSString *LGBLogFilePath(void) {
 
 static const NSInteger LGB_BG_TAG = 712001;
 static const NSInteger LGB_INDICATOR_TAG = 712002;
-static const NSInteger LGB_TINT_COLOR_TAG = 712012;
 static const NSInteger LGB_ASSET_TAG = 712013;
 static const void *kLGBScrollExtendedKey = &kLGBScrollExtendedKey;
 static const void *kLGBItemTapAttachedKey = &kLGBItemTapAttachedKey;
@@ -31,15 +31,15 @@ static BOOL pHaptics = YES;
 static BOOL pRefractBlur = YES;
 static BOOL pDebug = YES;
 static CGFloat pGlassAlpha = 0.88;
-static CGFloat pBlobAlpha = 0.92;
-static CGFloat pBlobWidthPct = 104.0;
-static CGFloat pBlobHeightPct = 92.0;
-static CGFloat pPillHeight = 60.0;
-static CGFloat pPillInset = 10.0;
+static CGFloat pBlobAlpha = 0.95;
+static CGFloat pBlobWidthPct = 82.0;
+static CGFloat pBlobHeightPct = 84.0;
+static CGFloat pPillHeight = 52.0;
+static CGFloat pPillInset = 16.0;
 static CGFloat pPillOffsetY = 0.0;
-static CGFloat pSpringPct = 60.0;
-static CGFloat pStretchPct = 65.0;
-static CGFloat pTouchScalePct = 105.0;
+static CGFloat pSpringPct = 55.0;
+static CGFloat pStretchPct = 50.0;
+static CGFloat pTouchScalePct = 104.0;
 static NSString *pSelectedColorHex = @"#0084FF";
 static NSString *pUnselectedColorHex = @"#A0A4AB";
 static NSString *pGlassTintHex = @"#141418";
@@ -104,24 +104,24 @@ static void LGBLoadPrefs(void) {
     pRefractBlur        = [LGBGetPref(@"refractBlur", @YES) boolValue];
     pDebug              = [LGBGetPref(@"debug", @YES) boolValue];
     pGlassAlpha         = [LGBGetPref(@"glassAlpha", @0.88) doubleValue];
-    pBlobAlpha          = [LGBGetPref(@"blobAlpha", @0.92) doubleValue];
-    pBlobWidthPct       = [LGBGetPref(@"blobWidthPct", @104.0) doubleValue];
-    pBlobHeightPct      = [LGBGetPref(@"blobHeightPct", @92.0) doubleValue];
-    pPillHeight         = [LGBGetPref(@"pillHeight", @60.0) doubleValue];
-    pPillInset          = [LGBGetPref(@"pillInset", @10.0) doubleValue];
+    pBlobAlpha          = [LGBGetPref(@"blobAlpha", @0.95) doubleValue];
+    pBlobWidthPct       = [LGBGetPref(@"blobWidthPct", @82.0) doubleValue];
+    pBlobHeightPct      = [LGBGetPref(@"blobHeightPct", @84.0) doubleValue];
+    pPillHeight         = [LGBGetPref(@"pillHeight", @52.0) doubleValue];
+    pPillInset          = [LGBGetPref(@"pillInset", @16.0) doubleValue];
     pPillOffsetY        = [LGBGetPref(@"pillOffsetY", @0.0) doubleValue];
-    pSpringPct          = [LGBGetPref(@"springPct", @60.0) doubleValue];
-    pStretchPct         = [LGBGetPref(@"stretchPct", @65.0) doubleValue];
-    pTouchScalePct      = [LGBGetPref(@"touchScalePct", @105.0) doubleValue];
+    pSpringPct          = [LGBGetPref(@"springPct", @55.0) doubleValue];
+    pStretchPct         = [LGBGetPref(@"stretchPct", @50.0) doubleValue];
+    pTouchScalePct      = [LGBGetPref(@"touchScalePct", @104.0) doubleValue];
 
-    if (pBlobWidthPct < 50 || pBlobWidthPct > 150) pBlobWidthPct = 104.0;
-    if (pBlobHeightPct < 50 || pBlobHeightPct > 140) pBlobHeightPct = 92.0;
-    if (pPillHeight < 44 || pPillHeight > 80) pPillHeight = 60.0;
-    if (pPillInset < 0 || pPillInset > 30) pPillInset = 10.0;
-    if (pPillOffsetY < -20 || pPillOffsetY > 20) pPillOffsetY = 0.0;
-    if (pSpringPct < 0 || pSpringPct > 100) pSpringPct = 60.0;
-    if (pStretchPct < 0 || pStretchPct > 100) pStretchPct = 65.0;
-    if (pTouchScalePct < 100 || pTouchScalePct > 120) pTouchScalePct = 105.0;
+    if (pBlobWidthPct < 55 || pBlobWidthPct > 120) pBlobWidthPct = 82.0;
+    if (pBlobHeightPct < 60 || pBlobHeightPct > 105) pBlobHeightPct = 84.0;
+    if (pPillHeight < 40 || pPillHeight > 68) pPillHeight = 52.0;
+    if (pPillInset < 2 || pPillInset > 36) pPillInset = 16.0;
+    if (pPillOffsetY < -16 || pPillOffsetY > 16) pPillOffsetY = 0.0;
+    if (pSpringPct < 0 || pSpringPct > 100) pSpringPct = 55.0;
+    if (pStretchPct < 0 || pStretchPct > 100) pStretchPct = 50.0;
+    if (pTouchScalePct < 100 || pTouchScalePct > 115) pTouchScalePct = 104.0;
 
     pSelectedColorHex   = LGBGetPref(@"selectedColorHex", @"#0084FF");
     pUnselectedColorHex = LGBGetPref(@"unselectedColorHex", @"#A0A4AB");
@@ -158,6 +158,10 @@ static UIColor *LGBGlassTintColor(void) {
 }
 
 // ------------------------------------------------------------------ asset kính
+// Vẽ viền sáng specular + thấu kính trong suốt kiểu Liquid Glass:
+// - Viên thuốc nền (isBlob=NO): phản xạ viền mảnh, để blur nền làm mờ nội dung phía sau.
+// - Thấu kính chọn (isBlob=YES): thấu kính trong suốt có độ nổi khối, ánh sáng tụ ở mép trên/dưới
+//   và lòng kính trong nhẹ, vẽ bằng ảnh tĩnh tốc độ cao để kéo 120Hz không bao giờ khựng.
 static UIImage *LGBGlassImageForSize(CGSize size, BOOL isBlob) {
     CGFloat w = round(size.width * 2.0) / 2.0;
     CGFloat h = round(size.height * 2.0) / 2.0;
@@ -181,20 +185,43 @@ static UIImage *LGBGlassImageForSize(CGSize size, BOOL isBlob) {
 
         [path addClip];
 
-        CGFloat topAlpha = isBlob ? 0.16 : 0.12;
-        CGFloat loc1[] = {0.0, 0.32, 0.72, 1.0};
-        CGFloat comp1[] = {
-            1, 1, 1, topAlpha,
-            1, 1, 1, 0.01,
-            1, 1, 1, 0.00,
-            1, 1, 1, isBlob ? 0.09 : 0.06
-        };
-        CGGradientRef g1 = CGGradientCreateWithColorComponents(cs, comp1, loc1, 4);
-        CGContextDrawLinearGradient(c, g1, CGPointMake(0, 0), CGPointMake(0, h), 0);
-        CGGradientRelease(g1);
+        if (isBlob) {
+            // Lòng thấu kính bán trong suốt dịu + ánh phản xạ tụ ở đỉnh và đáy
+            CGFloat loc1[] = {0.0, 0.28, 0.72, 1.0};
+            CGFloat comp1[] = {
+                1, 1, 1, 0.22,
+                1, 1, 1, 0.08,
+                1, 1, 1, 0.06,
+                1, 1, 1, 0.16
+            };
+            CGGradientRef g1 = CGGradientCreateWithColorComponents(cs, comp1, loc1, 4);
+            CGContextDrawLinearGradient(c, g1, CGPointMake(0, 0), CGPointMake(0, h), 0);
+            CGGradientRelease(g1);
 
+            // Quầng sáng tụ nhẹ ở nửa trên tạo cảm giác thấu kính cong
+            CGFloat locGlow[] = {0.0, 1.0};
+            CGFloat compGlow[] = {1, 1, 1, 0.14, 1, 1, 1, 0.0};
+            CGGradientRef gGlow = CGGradientCreateWithColorComponents(cs, compGlow, locGlow, 2);
+            CGPoint centerTop = CGPointMake(w * 0.5, h * 0.12);
+            CGContextDrawRadialGradient(c, gGlow, centerTop, 0, centerTop, MAX(w, h) * 0.55, 0);
+            CGGradientRelease(gGlow);
+        } else {
+            // Viên thuốc nền: giữ trong suốt ở giữa để blur xuyên qua rõ chữ/số phía sau
+            CGFloat loc1[] = {0.0, 0.30, 0.75, 1.0};
+            CGFloat comp1[] = {
+                1, 1, 1, 0.11,
+                1, 1, 1, 0.01,
+                1, 1, 1, 0.00,
+                1, 1, 1, 0.06
+            };
+            CGGradientRef g1 = CGGradientCreateWithColorComponents(cs, comp1, loc1, 4);
+            CGContextDrawLinearGradient(c, g1, CGPointMake(0, 0), CGPointMake(0, h), 0);
+            CGGradientRelease(g1);
+        }
+
+        // Viền sáng specular mảnh quanh mép viên thuốc
         CGContextSaveGState(c);
-        CGFloat lineW = isBlob ? 1.1 : 1.0;
+        CGFloat lineW = isBlob ? 1.15 : 0.95;
         UIBezierPath *rim = [UIBezierPath bezierPathWithRoundedRect:CGRectInset(rect, lineW * 0.5, lineW * 0.5)
                                                        cornerRadius:MAX(1.0, radius - lineW * 0.5)];
         CGContextSetLineWidth(c, lineW);
@@ -203,9 +230,9 @@ static UIImage *LGBGlassImageForSize(CGSize size, BOOL isBlob) {
         CGContextClip(c);
         CGFloat locRim[] = {0.0, 0.5, 1.0};
         CGFloat compRim[] = {
-            1, 1, 1, isBlob ? 0.55 : 0.48,
-            1, 1, 1, isBlob ? 0.16 : 0.12,
-            1, 1, 1, isBlob ? 0.34 : 0.28
+            1, 1, 1, isBlob ? 0.62 : 0.45,
+            1, 1, 1, isBlob ? 0.20 : 0.12,
+            1, 1, 1, isBlob ? 0.38 : 0.26
         };
         CGGradientRef gRim = CGGradientCreateWithColorComponents(cs, compRim, locRim, 3);
         CGContextDrawLinearGradient(c, gRim, CGPointMake(0, 0), CGPointMake(0, h), 0);
@@ -255,10 +282,8 @@ static BOOL LGBLooksLikeBadge(UIView *v) {
 @property (nonatomic, assign) NSInteger previewIndex;
 @property (nonatomic, assign) BOOL dragEngaged;
 @property (nonatomic, assign) BOOL isSettling;
-@property (nonatomic, assign) CGFloat dragStartX;
-@property (nonatomic, assign) CGFloat dragStartY;
-@property (nonatomic, assign) CGFloat lastDragX;
 @property (nonatomic, assign) CGFloat dragSettledCenterX;
+@property (nonatomic, assign) CGFloat smoothedStretch;
 @property (nonatomic, weak) UIView *dragBlob;
 @property (nonatomic, strong) NSTimer *scanTimer;
 @property (nonatomic, assign) NSInteger scanCount;
@@ -273,7 +298,7 @@ static BOOL LGBLooksLikeBadge(UIView *v) {
 - (void)styleCustomBar:(UIView *)bar items:(NSArray<UIView *> *)items;
 - (void)tabBarSelectionChanged:(UITabBar *)bar;
 - (void)tabBarSelectionChangedCustom;
-- (void)handlePan:(UILongPressGestureRecognizer *)pan;
+- (void)handlePan:(UIPanGestureRecognizer *)pan;
 - (void)handleItemTap:(UITapGestureRecognizer *)tap;
 - (void)customItemTapped:(UIControl *)sender;
 - (void)scanTick:(NSTimer *)timer;
@@ -287,13 +312,13 @@ static BOOL LGBLooksLikeBadge(UIView *v) {
 - (CGRect)pillFrameForBar:(UIView *)bar;
 - (CGRect)targetFrameForIndex:(NSInteger)idx bar:(UIView *)bar items:(NSArray<UIView *> *)items;
 - (CGFloat)springDamping;
-- (void)animateIndicatorToIndex:(NSInteger)idx bar:(UIView *)bar items:(NSArray<UIView *> *)items completion:(void (^)(void))completion;
+- (void)animateIndicatorToIndex:(NSInteger)idx bar:(UIView *)bar items:(NSArray<UIView *> *)items velocityX:(CGFloat)vx completion:(void (^)(void))completion;
 - (void)attachPanToBar:(UIView *)bar;
 - (void)attachTapObserversToItems:(NSArray<UIView *> *)items;
 - (void)hapticTick;
 - (NSArray<UIView *> *)tabBarButtons:(UITabBar *)bar;
 - (NSInteger)nearestIndex:(CGFloat)x centers:(NSArray<NSNumber *> *)centers;
-- (void)finishDragToIndex:(NSInteger)idx bar:(UIView *)bar isTabBar:(BOOL)isTab;
+- (void)finishDragToIndex:(NSInteger)idx bar:(UIView *)bar isTabBar:(BOOL)isTab velocityX:(CGFloat)vx;
 - (void)selectTabBarIndex:(NSInteger)idx bar:(UITabBar *)bar;
 - (void)selectCustomIndex:(NSInteger)idx;
 - (NSInteger)detectActiveIndexInItems:(NSArray<UIView *> *)items;
@@ -306,6 +331,7 @@ static BOOL LGBLooksLikeBadge(UIView *v) {
 - (void)dumpView:(UIView *)v window:(UIWindow *)win depth:(NSInteger)depth into:(NSMutableString *)out lines:(NSInteger *)lines;
 - (BOOL)subtree:(UIView *)v hasIconOrLabelAtDepth:(NSInteger)depth;
 - (void)collectCandidatesInView:(UIView *)v window:(UIWindow *)win depth:(NSInteger)depth best:(UIView **)best bestScore:(NSInteger *)bestScore bestItems:(NSArray<UIView *> **)bestItems;
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer;
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gr shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)other;
 @end
 
@@ -337,7 +363,7 @@ static BOOL LGBLooksLikeBadge(UIView *v) {
     LGBDiagWrite(@"diag_lastLoadAt", LGBNowString());
     LGBDiagWrite(@"diag_process", [[NSBundle mainBundle] bundleIdentifier] ?: @"?");
     [self writeDiagState:@"Da nap vao Messenger, dang quet thanh bar..."];
-    LGBLog(@"Khoi dong 1.4.0 trong process %@ (enabled=%d)", [[NSBundle mainBundle] bundleIdentifier], pEnabled);
+    LGBLog(@"Khoi dong 1.5.0 trong process %@ (enabled=%d)", [[NSBundle mainBundle] bundleIdentifier], pEnabled);
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(appDidBecomeActive:)
                                                  name:UIApplicationDidBecomeActiveNotification
@@ -454,6 +480,7 @@ static BOOL LGBLooksLikeBadge(UIView *v) {
     if (ind) [bar insertSubview:ind atIndex:firstIdx + (pill ? 1 : 0)];
 }
 
+// Viên thuốc nền gọn gàng (mặc định cao 52pt, lề ngang 16pt) cân đối với thanh tab bar iOS 26
 - (CGRect)pillFrameForBar:(UIView *)bar {
     CGFloat barW = bar.bounds.size.width;
     CGFloat barH = bar.bounds.size.height;
@@ -463,17 +490,18 @@ static BOOL LGBLooksLikeBadge(UIView *v) {
         safeBottom = win.safeAreaInsets.bottom;
     }
 
-    CGFloat pillH = MIN(MAX(pPillHeight, 46.0), MAX(46.0, barH - 4.0));
+    CGFloat pillH = MIN(MAX(pPillHeight, 40.0), MAX(40.0, barH - 4.0));
     CGFloat pillY = 0;
     if (safeBottom > 0) {
-        CGFloat bottomMargin = MAX(10.0, safeBottom - 18.0);
-        pillY = MAX(2.0, barH - bottomMargin - pillH);
+        // Căn giữa phần nội dung phía trên home indicator (chừa ~14pt cho vạch home)
+        CGFloat usableH = barH - MAX(12.0, safeBottom - 16.0);
+        pillY = MAX(2.0, (usableH - pillH) * 0.5);
     } else {
-        pillY = MAX(2.0, (barH - pillH) / 2.0);
+        pillY = MAX(2.0, (barH - pillH) * 0.5);
     }
     pillY = MIN(MAX(pillY + pPillOffsetY, 0.0), MAX(0.0, barH - pillH));
 
-    CGFloat inset = MIN(MAX(pPillInset, 0.0), barW / 4.0);
+    CGFloat inset = MIN(MAX(pPillInset, 2.0), barW / 4.0);
     return CGRectMake(inset, pillY, barW - inset * 2.0, pillH);
 }
 
@@ -489,7 +517,7 @@ static BOOL LGBLooksLikeBadge(UIView *v) {
             fx.frame = existing.bounds;
             fx.layer.cornerRadius = frame.size.height / 2.0;
             for (UIView *sub in fx.contentView.subviews) {
-                sub.backgroundColor = [LGBGlassTintColor() colorWithAlphaComponent:0.24];
+                sub.backgroundColor = [LGBGlassTintColor() colorWithAlphaComponent:0.22];
                 sub.frame = fx.bounds;
             }
             fx.alpha = pGlassAlpha;
@@ -511,9 +539,9 @@ static BOOL LGBLooksLikeBadge(UIView *v) {
     holder.userInteractionEnabled = NO;
     holder.backgroundColor = [UIColor clearColor];
     holder.layer.shadowColor = [UIColor blackColor].CGColor;
-    holder.layer.shadowOpacity = 0.35;
-    holder.layer.shadowRadius = 12.0;
-    holder.layer.shadowOffset = CGSizeMake(0, 4);
+    holder.layer.shadowOpacity = 0.32;
+    holder.layer.shadowRadius = 10.0;
+    holder.layer.shadowOffset = CGSizeMake(0, 3);
     holder.layer.shadowPath = [UIBezierPath bezierPathWithRoundedRect:holder.bounds
                                                          cornerRadius:frame.size.height / 2.0].CGPath;
 
@@ -526,7 +554,7 @@ static BOOL LGBLooksLikeBadge(UIView *v) {
 
     UIView *tint = [[UIView alloc] initWithFrame:fx.bounds];
     tint.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    tint.backgroundColor = [LGBGlassTintColor() colorWithAlphaComponent:0.24];
+    tint.backgroundColor = [LGBGlassTintColor() colorWithAlphaComponent:0.22];
     tint.userInteractionEnabled = NO;
     [fx.contentView addSubview:tint];
     [holder addSubview:fx];
@@ -544,35 +572,25 @@ static BOOL LGBLooksLikeBadge(UIView *v) {
     return holder;
 }
 
+// Thấu kính chọn dùng ảnh specular tĩnh tốc độ cao (không lồng thêm UIVisualEffectView)
+// để tránh nghẽn GPU khi trượt qua lại trên lớp blur của viên thuốc nền.
 - (void)refreshIndicator:(UIView *)ind {
     if (!ind) return;
     ind.backgroundColor = [UIColor clearColor];
     CGFloat h = ind.bounds.size.height;
     ind.layer.shadowColor = [UIColor blackColor].CGColor;
-    ind.layer.shadowOpacity = 0.25;
-    ind.layer.shadowRadius = 8.0;
+    ind.layer.shadowOpacity = 0.22;
+    ind.layer.shadowRadius = 6.0;
     ind.layer.shadowOffset = CGSizeMake(0, 2);
     if (ind.bounds.size.width > 0 && h > 0) {
         ind.layer.shadowPath = [UIBezierPath bezierPathWithRoundedRect:ind.bounds
                                                           cornerRadius:h / 2.0].CGPath;
     }
-    for (UIView *sub in ind.subviews) {
-        if ([sub isKindOfClass:[UIVisualEffectView class]]) {
-            UIVisualEffectView *fx = (UIVisualEffectView *)sub;
-            fx.frame = ind.bounds;
-            fx.layer.cornerRadius = h / 2.0;
-            fx.alpha = pBlobAlpha;
-            for (UIView *s2 in fx.contentView.subviews) {
-                if (s2.tag == LGB_TINT_COLOR_TAG) {
-                    s2.frame = fx.bounds;
-                    s2.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.08];
-                }
-            }
-        } else if (sub.tag == LGB_ASSET_TAG) {
-            sub.frame = ind.bounds;
-            ((UIImageView *)sub).image = LGBGlassImageForSize(ind.bounds.size, YES);
-            sub.alpha = pBlobAlpha;
-        }
+    UIImageView *asset = (UIImageView *)[ind viewWithTag:LGB_ASSET_TAG];
+    if (asset) {
+        asset.frame = ind.bounds;
+        asset.image = LGBGlassImageForSize(ind.bounds.size, YES);
+        asset.alpha = pBlobAlpha;
     }
 }
 
@@ -589,20 +607,6 @@ static BOOL LGBLooksLikeBadge(UIView *v) {
     ind.userInteractionEnabled = NO;
     ind.backgroundColor = [UIColor clearColor];
 
-    UIVisualEffectView *fx = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemUltraThinMaterialDark]];
-    fx.frame = ind.bounds;
-    fx.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    fx.layer.masksToBounds = YES;
-    fx.alpha = pBlobAlpha;
-
-    UIView *colorTint = [[UIView alloc] initWithFrame:fx.bounds];
-    colorTint.tag = LGB_TINT_COLOR_TAG;
-    colorTint.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    colorTint.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.08];
-    colorTint.userInteractionEnabled = NO;
-    [fx.contentView addSubview:colorTint];
-    [ind addSubview:fx];
-
     UIImageView *asset = [[UIImageView alloc] initWithFrame:ind.bounds];
     asset.tag = LGB_ASSET_TAG;
     asset.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -616,66 +620,33 @@ static BOOL LGBLooksLikeBadge(UIView *v) {
     return ind;
 }
 
+// Khung cục glass thon gọn: rộng 82% ô tab, cao 84% viên thuốc nền -> cân đối, không bị phình to
 - (CGRect)targetFrameForIndex:(NSInteger)idx bar:(UIView *)bar items:(NSArray<UIView *> *)items {
     CGRect pill = [self pillFrameForBar:bar];
     UIView *item = items[idx];
 
     CGFloat slotW = (items.count > 0) ? (pill.size.width / items.count) : item.bounds.size.width;
-    CGFloat baseW = MIN(item.bounds.size.width, slotW);
-    if (baseW < 36.0) baseW = slotW;
+    CGFloat w = slotW * (pBlobWidthPct / 100.0);
+    CGFloat h = pill.size.height * (pBlobHeightPct / 100.0);
 
-    CGFloat w = baseW * (pBlobWidthPct / 100.0);
-    CGFloat h = (pill.size.height - 6.0) * (pBlobHeightPct / 100.0);
-
-    w = MIN(MAX(w, 46.0), MAX(46.0, pill.size.width - 6.0));
-    h = MIN(MAX(h, 42.0), MAX(42.0, pill.size.height - 4.0));
+    w = MIN(MAX(w, 44.0), MAX(44.0, pill.size.width - 8.0));
+    h = MIN(MAX(h, 36.0), MAX(36.0, pill.size.height - 4.0));
 
     CGFloat cx = CGRectGetMidX(item.frame);
-    CGFloat minCx = CGRectGetMinX(pill) + w / 2.0 + 3.0;
-    CGFloat maxCx = CGRectGetMaxX(pill) - w / 2.0 - 3.0;
+    CGFloat minCx = CGRectGetMinX(pill) + w / 2.0 + 4.0;
+    CGFloat maxCx = CGRectGetMaxX(pill) - w / 2.0 - 4.0;
     cx = (maxCx >= minCx) ? MIN(MAX(cx, minCx), maxCx) : CGRectGetMidX(pill);
 
-    CGRect contentV = item.frame;
-    NSMutableArray<UIView *> *stack = [NSMutableArray arrayWithObject:item];
-    while (stack.count > 0) {
-        UIView *v = stack.lastObject;
-        [stack removeLastObject];
-        if (v != item) {
-            if (LGBLooksLikeBadge(v)) continue;
-            if ([v isKindOfClass:[UILabel class]] ||
-                ([v isKindOfClass:[UIImageView class]] && v.bounds.size.width >= 16 && v.bounds.size.height >= 16)) {
-                contentV = CGRectUnion(contentV, [v convertRect:v.bounds toView:bar]);
-            }
-        }
-        for (UIView *sub in v.subviews) {
-            if (sub.tag != LGB_BG_TAG && sub.tag != LGB_INDICATOR_TAG) [stack addObject:sub];
-        }
-    }
-    for (UIView *sub in bar.subviews) {
-        if (![sub isKindOfClass:[UILabel class]] || [sub isDescendantOfView:item] || LGBLooksLikeBadge(sub)) continue;
-        CGFloat lcx = CGRectGetMidX(sub.frame);
-        if (fabs(lcx - cx) <= slotW * 0.45 && CGRectGetMinY(sub.frame) >= CGRectGetMinY(item.frame)) {
-            contentV = CGRectUnion(contentV, sub.frame);
-        }
-    }
-
+    // Căn tâm dọc giữa viên thuốc nền (vốn đã được đặt cân đối quanh cụm icon + chữ)
     CGFloat cy = CGRectGetMidY(pill);
-    CGFloat contentMidY = CGRectGetMidY(contentV);
-    if (fabs(contentMidY - cy) <= 8.0) {
-        cy = (cy + contentMidY) * 0.5;
-    }
-    CGFloat minCy = CGRectGetMinY(pill) + h / 2.0 + 2.0;
-    CGFloat maxCy = CGRectGetMaxY(pill) - h / 2.0 - 2.0;
-    cy = (maxCy >= minCy) ? MIN(MAX(cy, minCy), maxCy) : CGRectGetMidY(pill);
-
     return CGRectMake(cx - w / 2.0, cy - h / 2.0, w, h);
 }
 
 - (CGFloat)springDamping {
-    return 1.0 - 0.52 * (pSpringPct / 100.0);
+    return 1.0 - 0.45 * (pSpringPct / 100.0);
 }
 
-- (void)animateIndicatorToIndex:(NSInteger)idx bar:(UIView *)bar items:(NSArray<UIView *> *)items completion:(void (^)(void))completion {
+- (void)animateIndicatorToIndex:(NSInteger)idx bar:(UIView *)bar items:(NSArray<UIView *> *)items velocityX:(CGFloat)vx completion:(void (^)(void))completion {
     UIView *ind = [self indicatorInBar:bar belowItems:items];
     CGRect target = [self targetFrameForIndex:idx bar:bar items:items];
     CGFloat dx = CGRectGetMidX(target) - CGRectGetMidX(ind.frame);
@@ -686,9 +657,17 @@ static BOOL LGBLooksLikeBadge(UIView *v) {
         if (completion) completion();
         return;
     }
+
+    CGFloat springVel = 0.0;
+    if (fabs(dx) > 1.0) {
+        springVel = MIN(MAX(vx / dx, -3.0), 3.0);
+    }
+
     self.isSettling = YES;
-    [UIView animateWithDuration:0.38 delay:0
-         usingSpringWithDamping:[self springDamping] initialSpringVelocity:0.6
+    [UIView animateWithDuration:0.34
+                          delay:0
+         usingSpringWithDamping:[self springDamping]
+          initialSpringVelocity:springVel
                         options:(UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionAllowUserInteraction)
                      animations:^{
                          ind.transform = CGAffineTransformMakeTranslation(dx, 0);
@@ -705,15 +684,14 @@ static BOOL LGBLooksLikeBadge(UIView *v) {
 - (void)attachPanToBar:(UIView *)bar {
     if (!pDragEnabled) return;
     for (UIGestureRecognizer *gr in bar.gestureRecognizers) {
-        if ([gr isKindOfClass:[UILongPressGestureRecognizer class]] && gr.delegate == self) return;
+        if ([gr isKindOfClass:[UIPanGestureRecognizer class]] && gr.delegate == self) return;
     }
-    UILongPressGestureRecognizer *pan = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
+    UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
     pan.delegate = self;
-    pan.minimumPressDuration = 0;
-    pan.allowableMovement = CGFLOAT_MAX;
-    pan.cancelsTouchesInView = NO;
+    pan.maximumNumberOfTouches = 1;
+    pan.cancelsTouchesInView = YES;
     [bar addGestureRecognizer:pan];
-    LGBLog(@"Da gan cu chi keo truot len bar class %@", NSStringFromClass([bar class]));
+    LGBLog(@"Da gan UIPanGestureRecognizer len bar class %@", NSStringFromClass([bar class]));
 }
 
 - (void)attachTapObserversToItems:(NSArray<UIView *> *)items {
@@ -728,8 +706,21 @@ static BOOL LGBLooksLikeBadge(UIView *v) {
     }
 }
 
+// Chỉ nhận diện pan khi người dùng vuốt ngang (tránh chặn vuốt dọc cuộn danh sách chat)
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    if ([gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]]) {
+        UIPanGestureRecognizer *pan = (UIPanGestureRecognizer *)gestureRecognizer;
+        CGPoint vel = [pan velocityInView:pan.view];
+        return fabs(vel.x) >= fabs(vel.y) * 0.75;
+    }
+    return YES;
+}
+
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gr shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)other {
-    (void)gr; (void)other;
+    // Khi đang vuốt pan thì không cho tap bên dưới kích hoạt nhầm
+    if ([gr isKindOfClass:[UIPanGestureRecognizer class]] && [other isKindOfClass:[UITapGestureRecognizer class]]) {
+        return NO;
+    }
     return YES;
 }
 
@@ -793,7 +784,7 @@ static BOOL LGBLooksLikeBadge(UIView *v) {
     if (buttons.count == 0 || bar.items.count == 0 || !bar.selectedItem) return;
     NSInteger sel = (NSInteger)[bar.items indexOfObject:bar.selectedItem];
     if (sel == NSNotFound || sel >= (NSInteger)buttons.count) return;
-    [self animateIndicatorToIndex:sel bar:bar items:buttons completion:nil];
+    [self animateIndicatorToIndex:sel bar:bar items:buttons velocityX:0 completion:nil];
 }
 
 - (void)selectTabBarIndex:(NSInteger)idx bar:(UITabBar *)bar {
@@ -1008,10 +999,10 @@ static BOOL LGBLooksLikeBadge(UIView *v) {
     LGBLog(@"Chon muc tu che thu %ld (triggered=%d)", (long)idx, triggered);
 }
 
-// ---------------------------------------------------------- kéo trượt
+// ---------------------------------------------------------- kéo trượt mượt 120Hz
 - (void)tabBarSelectionChangedCustom {
     if (!self.customBar || !self.customItems || self.dragEngaged) return;
-    [self animateIndicatorToIndex:self.customSelectedIndex bar:self.customBar items:self.customItems completion:nil];
+    [self animateIndicatorToIndex:self.customSelectedIndex bar:self.customBar items:self.customItems velocityX:0 completion:nil];
     [self applyCustomSelectionVisual];
 }
 
@@ -1025,7 +1016,7 @@ static BOOL LGBLooksLikeBadge(UIView *v) {
     return best;
 }
 
-- (void)handlePan:(UILongPressGestureRecognizer *)pan {
+- (void)handlePan:(UIPanGestureRecognizer *)pan {
     if (!pEnabled || !pDragEnabled) return;
     UIView *bar = pan.view;
     if (!bar) return;
@@ -1037,9 +1028,8 @@ static BOOL LGBLooksLikeBadge(UIView *v) {
 
     NSMutableArray<NSNumber *> *centers = [NSMutableArray array];
     for (UIView *it in items) [centers addObject:@(CGRectGetMidX(it.frame))];
-    CGPoint pt = [pan locationInView:bar];
-    CGFloat x = pt.x;
-    CGFloat y = pt.y;
+    CGFloat x = [pan locationInView:bar].x;
+    CGFloat vx = [pan velocityInView:bar].x;
     CGFloat minX = centers.firstObject.doubleValue;
     CGFloat maxX = centers.lastObject.doubleValue;
     CGFloat clampedX = MIN(MAX(x, minX), maxX);
@@ -1050,46 +1040,46 @@ static BOOL LGBLooksLikeBadge(UIView *v) {
 
     switch (pan.state) {
         case UIGestureRecognizerStateBegan: {
-            self.dragEngaged = NO;
-            self.dragBlob = nil;
-            self.dragStartX = x;
-            self.dragStartY = y;
-            self.lastDragX = x;
+            if (ind.frame.size.width < 10) return;
+            self.isSettling = NO;
+            // Chốt vị trí hiện tại trên màn hình (kể cả nếu đang chạy dở animation trước đó)
+            CALayer *pres = ind.layer.presentationLayer;
+            if (pres) {
+                CGRect currentVisual = pres.frame;
+                [ind.layer removeAllAnimations];
+                ind.transform = CGAffineTransformIdentity;
+                ind.frame = currentVisual;
+            } else {
+                [ind.layer removeAllAnimations];
+                ind.transform = CGAffineTransformIdentity;
+            }
+
+            self.dragEngaged = YES;
+            self.previewIndex = nearIdx;
+            self.dragBlob = ind;
+            self.dragSettledCenterX = CGRectGetMidX(ind.frame);
+            self.smoothedStretch = 0.0;
+            [self hapticTick];
+            if (!isTab) [self applyCustomSelectionVisual];
             break;
         }
         case UIGestureRecognizerStateChanged: {
-            if (!self.dragEngaged) {
-                CGFloat totalDx = fabs(x - self.dragStartX);
-                CGFloat totalDy = fabs(y - self.dragStartY);
-                if (totalDx < 5.0 || totalDx < totalDy * 0.8) return;
-                if (ind.frame.size.width < 10) return;
-
-                self.isSettling = NO;
-                [ind.layer removeAllAnimations];
-                ind.transform = CGAffineTransformIdentity;
-
-                self.dragEngaged = YES;
-                self.previewIndex = nearIdx;
-                self.dragBlob = ind;
-                self.dragSettledCenterX = CGRectGetMidX(ind.frame);
-                [self hapticTick];
-                if (!isTab) [self applyCustomSelectionVisual];
-            }
-
+            if (!self.dragEngaged) return;
             UIView *blob = self.dragBlob ?: ind;
             CGFloat tx = clampedX - self.dragSettledCenterX;
-            CGFloat txMin = CGRectGetMinX(pill) + 3.0 - CGRectGetMinX(blob.frame);
-            CGFloat txMax = CGRectGetMaxX(pill) - 3.0 - CGRectGetMaxX(blob.frame);
+            CGFloat txMin = CGRectGetMinX(pill) + 4.0 - CGRectGetMinX(blob.frame);
+            CGFloat txMax = CGRectGetMaxX(pill) - 4.0 - CGRectGetMaxX(blob.frame);
             tx = MIN(MAX(tx, txMin), txMax);
 
-            CGFloat dx = x - self.lastDragX;
-            self.lastDragX = x;
+            // Làm mượt vận tốc kéo bằng bộ lọc thông thấp để không bao giờ rung giật
+            CGFloat maxStretch = 0.22 * (pStretchPct / 100.0);
+            CGFloat targetStretch = (maxStretch > 0.001)
+                ? MIN(maxStretch, (fabs(vx) / 1400.0) * maxStretch) : 0.0;
+            self.smoothedStretch = self.smoothedStretch * 0.65 + targetStretch * 0.35;
+
             CGFloat baseScale = pTouchScalePct / 100.0;
-            CGFloat maxStretch = 0.28 * (pStretchPct / 100.0);
-            CGFloat stretch = (maxStretch > 0.001)
-                ? MIN(maxStretch, fabs(dx) / 100.0 * (maxStretch / 0.18)) : 0;
-            CGFloat sx = baseScale * (1.0 + stretch);
-            CGFloat sy = baseScale / (1.0 + stretch * 0.50);
+            CGFloat sx = baseScale * (1.0 + self.smoothedStretch);
+            CGFloat sy = baseScale / (1.0 + self.smoothedStretch * 0.45);
 
             CGAffineTransform tr = CGAffineTransformMakeTranslation(tx, 0);
             tr = CGAffineTransformScale(tr, sx, sy);
@@ -1105,11 +1095,20 @@ static BOOL LGBLooksLikeBadge(UIView *v) {
         case UIGestureRecognizerStateEnded:
         case UIGestureRecognizerStateCancelled: {
             if (!self.dragEngaged) return;
+            // Nếu vuốt nhanh sang trái/phải thì ưu tiên đẩy sang tab theo hướng vuốt
             NSInteger target = nearIdx;
+            if (fabs(vx) > 450.0) {
+                NSInteger dir = (vx > 0) ? 1 : -1;
+                NSInteger stepIdx = MIN(MAX(self.customSelectedIndex + dir, 0), (NSInteger)items.count - 1);
+                if (abs((int)(target - self.customSelectedIndex)) == 0 && stepIdx != self.customSelectedIndex) {
+                    target = stepIdx;
+                }
+            }
             self.dragEngaged = NO;
             self.dragBlob = nil;
             self.previewIndex = -1;
-            [self finishDragToIndex:target bar:bar isTabBar:isTab];
+            self.smoothedStretch = 0.0;
+            [self finishDragToIndex:target bar:bar isTabBar:isTab velocityX:vx];
             break;
         }
         default:
@@ -1117,12 +1116,17 @@ static BOOL LGBLooksLikeBadge(UIView *v) {
     }
 }
 
-- (void)finishDragToIndex:(NSInteger)idx bar:(UIView *)bar isTabBar:(BOOL)isTab {
+- (void)finishDragToIndex:(NSInteger)idx bar:(UIView *)bar isTabBar:(BOOL)isTab velocityX:(CGFloat)vx {
     NSArray<UIView *> *items = isTab ? [self tabBarButtons:(UITabBar *)bar] : self.customItems;
     if (!items || idx < 0 || idx >= (NSInteger)items.count) return;
-    if (isTab) [self selectTabBarIndex:idx bar:(UITabBar *)bar];
-    else [self selectCustomIndex:idx];
-    [self animateIndicatorToIndex:idx bar:bar items:items completion:nil];
+
+    // Chạy lò xo mượt sang tab đích trước, sau 0.08s mới kích hoạt chuyển tab của Messenger
+    // để việc nạp lại view controller của Messenger không làm khựng animation của glass
+    [self animateIndicatorToIndex:idx bar:bar items:items velocityX:vx completion:nil];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.08 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (isTab) [self selectTabBarIndex:idx bar:(UITabBar *)bar];
+        else [self selectCustomIndex:idx];
+    });
 }
 
 // ---------------------------------------------------------- quét bar tự chế

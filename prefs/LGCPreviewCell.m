@@ -40,20 +40,39 @@ static UIImage *LGCGlassImageForSize(CGSize size, BOOL isBlob) {
         CGColorSpaceRef cs = CGColorSpaceCreateDeviceRGB();
 
         [path addClip];
-        CGFloat topAlpha = isBlob ? 0.16 : 0.12;
-        CGFloat loc1[] = {0.0, 0.32, 0.72, 1.0};
-        CGFloat comp1[] = {
-            1, 1, 1, topAlpha,
-            1, 1, 1, 0.01,
-            1, 1, 1, 0.00,
-            1, 1, 1, isBlob ? 0.09 : 0.06
-        };
-        CGGradientRef g1 = CGGradientCreateWithColorComponents(cs, comp1, loc1, 4);
-        CGContextDrawLinearGradient(c, g1, CGPointMake(0, 0), CGPointMake(0, h), 0);
-        CGGradientRelease(g1);
+        if (isBlob) {
+            CGFloat loc1[] = {0.0, 0.28, 0.72, 1.0};
+            CGFloat comp1[] = {
+                1, 1, 1, 0.22,
+                1, 1, 1, 0.08,
+                1, 1, 1, 0.06,
+                1, 1, 1, 0.16
+            };
+            CGGradientRef g1 = CGGradientCreateWithColorComponents(cs, comp1, loc1, 4);
+            CGContextDrawLinearGradient(c, g1, CGPointMake(0, 0), CGPointMake(0, h), 0);
+            CGGradientRelease(g1);
+
+            CGFloat locGlow[] = {0.0, 1.0};
+            CGFloat compGlow[] = {1, 1, 1, 0.14, 1, 1, 1, 0.0};
+            CGGradientRef gGlow = CGGradientCreateWithColorComponents(cs, compGlow, locGlow, 2);
+            CGPoint centerTop = CGPointMake(w * 0.5, h * 0.12);
+            CGContextDrawRadialGradient(c, gGlow, centerTop, 0, centerTop, MAX(w, h) * 0.55, 0);
+            CGGradientRelease(gGlow);
+        } else {
+            CGFloat loc1[] = {0.0, 0.30, 0.75, 1.0};
+            CGFloat comp1[] = {
+                1, 1, 1, 0.11,
+                1, 1, 1, 0.01,
+                1, 1, 1, 0.00,
+                1, 1, 1, 0.06
+            };
+            CGGradientRef g1 = CGGradientCreateWithColorComponents(cs, comp1, loc1, 4);
+            CGContextDrawLinearGradient(c, g1, CGPointMake(0, 0), CGPointMake(0, h), 0);
+            CGGradientRelease(g1);
+        }
 
         CGContextSaveGState(c);
-        CGFloat lineW = isBlob ? 1.1 : 1.0;
+        CGFloat lineW = isBlob ? 1.15 : 0.95;
         UIBezierPath *rim = [UIBezierPath bezierPathWithRoundedRect:CGRectInset(rect, lineW * 0.5, lineW * 0.5)
                                                        cornerRadius:MAX(1.0, radius - lineW * 0.5)];
         CGContextSetLineWidth(c, lineW);
@@ -62,9 +81,9 @@ static UIImage *LGCGlassImageForSize(CGSize size, BOOL isBlob) {
         CGContextClip(c);
         CGFloat locRim[] = {0.0, 0.5, 1.0};
         CGFloat compRim[] = {
-            1, 1, 1, isBlob ? 0.55 : 0.48,
-            1, 1, 1, isBlob ? 0.16 : 0.12,
-            1, 1, 1, isBlob ? 0.34 : 0.28
+            1, 1, 1, isBlob ? 0.62 : 0.45,
+            1, 1, 1, isBlob ? 0.20 : 0.12,
+            1, 1, 1, isBlob ? 0.38 : 0.26
         };
         CGGradientRef gRim = CGGradientCreateWithColorComponents(cs, compRim, locRim, 3);
         CGContextDrawLinearGradient(c, gRim, CGPointMake(0, 0), CGPointMake(0, h), 0);
@@ -91,17 +110,14 @@ static UIImage *LGCGlassImageForSize(CGSize size, BOOL isBlob) {
 @property (nonatomic, strong) UIView *pillTint;
 @property (nonatomic, strong) UIImageView *pillAsset;
 @property (nonatomic, strong) UIView *blobContainer;
-@property (nonatomic, strong) UIVisualEffectView *blobFx;
-@property (nonatomic, strong) UIView *blobTint;
 @property (nonatomic, strong) UIImageView *blobAsset;
 @property (nonatomic, strong) NSArray<UIImageView *> *iconViews;
 @property (nonatomic, strong) NSArray<UILabel *> *labelViews;
 @property (nonatomic, assign) NSInteger selectedIndex;
 @property (nonatomic, assign) NSInteger hoverIndex;
 @property (nonatomic, assign) BOOL isDragging;
-@property (nonatomic, assign) CGFloat dragStartX;
-@property (nonatomic, assign) CGFloat lastDragX;
 @property (nonatomic, assign) CGFloat settledCenterX;
+@property (nonatomic, assign) CGFloat smoothedStretch;
 @property (nonatomic, assign) CGRect currentPillRect;
 @property (nonatomic, assign) CGFloat springPct;
 @property (nonatomic, assign) CGFloat stretchPct;
@@ -160,7 +176,7 @@ static void LGCPreviewPrefsChanged(CFNotificationCenterRef center, void *observe
 
     self.bgDigitsLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     self.bgDigitsLabel.text = @"0269 8891588 • Hạnh Hồ (2) • Việt Nam";
-    self.bgDigitsLabel.font = [UIFont systemFontOfSize:21 weight:UIFontWeightBold];
+    self.bgDigitsLabel.font = [UIFont systemFontOfSize:20 weight:UIFontWeightBold];
     self.bgDigitsLabel.textColor = [UIColor colorWithRed:1.0 green:0.24 blue:0.20 alpha:0.95];
     [self.stageView addSubview:self.bgDigitsLabel];
 
@@ -175,7 +191,7 @@ static void LGCPreviewPrefsChanged(CFNotificationCenterRef center, void *observe
     self.fakeRows = rows;
 
     self.hintLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-    self.hintLabel.text = @"Chạm hoặc kéo thử glass trên khung này";
+    self.hintLabel.text = @"Vuốt ngang hoặc chạm thử trên thanh kính";
     self.hintLabel.font = [UIFont systemFontOfSize:11 weight:UIFontWeightMedium];
     self.hintLabel.textColor = [UIColor colorWithWhite:1.0 alpha:0.65];
     self.hintLabel.textAlignment = NSTextAlignmentCenter;
@@ -197,16 +213,6 @@ static void LGCPreviewPrefsChanged(CFNotificationCenterRef center, void *observe
     self.blobContainer.backgroundColor = [UIColor clearColor];
     [self.stageView addSubview:self.blobContainer];
 
-    self.blobFx = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemUltraThinMaterialDark]];
-    self.blobFx.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    self.blobFx.layer.masksToBounds = YES;
-    self.blobTint = [[UIView alloc] initWithFrame:CGRectZero];
-    self.blobTint.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    self.blobTint.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.08];
-    self.blobTint.userInteractionEnabled = NO;
-    [self.blobFx.contentView addSubview:self.blobTint];
-    [self.blobContainer addSubview:self.blobFx];
-
     self.blobAsset = [[UIImageView alloc] initWithFrame:CGRectZero];
     self.blobAsset.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.blobAsset.userInteractionEnabled = NO;
@@ -214,7 +220,7 @@ static void LGCPreviewPrefsChanged(CFNotificationCenterRef center, void *observe
 
     NSArray<NSString *> *symbols = @[@"message.fill", @"person.2.fill", @"bell.fill", @"line.3.horizontal"];
     NSArray<NSString *> *names = @[@"Đoạn chat", @"Mọi người", @"Thông báo", @"Menu"];
-    UIImageSymbolConfiguration *cfg = [UIImageSymbolConfiguration configurationWithPointSize:22 weight:UIImageSymbolWeightMedium];
+    UIImageSymbolConfiguration *cfg = [UIImageSymbolConfiguration configurationWithPointSize:20 weight:UIImageSymbolWeightMedium];
     NSMutableArray<UIImageView *> *icons = [NSMutableArray array];
     NSMutableArray<UILabel *> *labels = [NSMutableArray array];
     for (NSInteger i = 0; i < 4; i++) {
@@ -225,7 +231,7 @@ static void LGCPreviewPrefsChanged(CFNotificationCenterRef center, void *observe
 
         UILabel *lab = [[UILabel alloc] initWithFrame:CGRectZero];
         lab.text = names[i];
-        lab.font = [UIFont systemFontOfSize:10 weight:UIFontWeightMedium];
+        lab.font = [UIFont systemFontOfSize:9.5 weight:UIFontWeightMedium];
         lab.textAlignment = NSTextAlignmentCenter;
         [self.stageView addSubview:lab];
         [labels addObject:lab];
@@ -233,11 +239,13 @@ static void LGCPreviewPrefsChanged(CFNotificationCenterRef center, void *observe
     self.iconViews = icons;
     self.labelViews = labels;
 
-    UILongPressGestureRecognizer *drag = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handlePreviewDrag:)];
-    drag.minimumPressDuration = 0;
-    drag.allowableMovement = CGFLOAT_MAX;
-    drag.delegate = self;
-    [self.stageView addGestureRecognizer:drag];
+    UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePreviewPan:)];
+    pan.maximumNumberOfTouches = 1;
+    pan.delegate = self;
+    [self.stageView addGestureRecognizer:pan];
+
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handlePreviewTap:)];
+    [self.stageView addGestureRecognizer:tap];
 }
 
 - (void)layoutSubviews {
@@ -251,10 +259,10 @@ static void LGCPreviewPrefsChanged(CFNotificationCenterRef center, void *observe
 - (CGRect)blobFrameForIndex:(NSInteger)idx pill:(CGRect)pill wPct:(CGFloat)wPct hPct:(CGFloat)hPct {
     NSInteger n = 4;
     CGFloat slotW = pill.size.width / n;
-    CGFloat bw = MIN(MAX(slotW * (wPct / 100.0), 44.0), pill.size.width - 6.0);
-    CGFloat bh = MIN(MAX((pill.size.height - 6.0) * (hPct / 100.0), 40.0), pill.size.height - 4.0);
+    CGFloat bw = MIN(MAX(slotW * (wPct / 100.0), 44.0), pill.size.width - 8.0);
+    CGFloat bh = MIN(MAX(pill.size.height * (hPct / 100.0), 36.0), pill.size.height - 4.0);
     CGFloat cx = CGRectGetMinX(pill) + slotW * (idx + 0.5);
-    cx = MIN(MAX(cx, CGRectGetMinX(pill) + bw / 2.0 + 3.0), CGRectGetMaxX(pill) - bw / 2.0 - 3.0);
+    cx = MIN(MAX(cx, CGRectGetMinX(pill) + bw / 2.0 + 4.0), CGRectGetMaxX(pill) - bw / 2.0 - 4.0);
     CGFloat cy = CGRectGetMidY(pill);
     return CGRectMake(cx - bw / 2.0, cy - bh / 2.0, bw, bh);
 }
@@ -282,14 +290,14 @@ static void LGCPreviewPrefsChanged(CFNotificationCenterRef center, void *observe
     NSString *unselHex = [d stringForKey:@"unselectedColorHex"] ?: @"#A0A4AB";
     NSString *tintHex = [d stringForKey:@"glassTintHex"] ?: @"#141418";
     CGFloat glassAlpha = [d objectForKey:@"glassAlpha"] ? (CGFloat)[d doubleForKey:@"glassAlpha"] : 0.88;
-    CGFloat blobAlpha = [d objectForKey:@"blobAlpha"] ? (CGFloat)[d doubleForKey:@"blobAlpha"] : 0.92;
-    CGFloat wPct = [d objectForKey:@"blobWidthPct"] ? (CGFloat)[d doubleForKey:@"blobWidthPct"] : 104.0;
-    CGFloat hPct = [d objectForKey:@"blobHeightPct"] ? (CGFloat)[d doubleForKey:@"blobHeightPct"] : 92.0;
-    CGFloat pillH = [d objectForKey:@"pillHeight"] ? (CGFloat)[d doubleForKey:@"pillHeight"] : 60.0;
-    CGFloat inset = [d objectForKey:@"pillInset"] ? (CGFloat)[d doubleForKey:@"pillInset"] : 10.0;
-    self.springPct = [d objectForKey:@"springPct"] ? (CGFloat)[d doubleForKey:@"springPct"] : 60.0;
-    self.stretchPct = [d objectForKey:@"stretchPct"] ? (CGFloat)[d doubleForKey:@"stretchPct"] : 65.0;
-    self.touchScalePct = [d objectForKey:@"touchScalePct"] ? (CGFloat)[d doubleForKey:@"touchScalePct"] : 105.0;
+    CGFloat blobAlpha = [d objectForKey:@"blobAlpha"] ? (CGFloat)[d doubleForKey:@"blobAlpha"] : 0.95;
+    CGFloat wPct = [d objectForKey:@"blobWidthPct"] ? (CGFloat)[d doubleForKey:@"blobWidthPct"] : 82.0;
+    CGFloat hPct = [d objectForKey:@"blobHeightPct"] ? (CGFloat)[d doubleForKey:@"blobHeightPct"] : 84.0;
+    CGFloat pillH = [d objectForKey:@"pillHeight"] ? (CGFloat)[d doubleForKey:@"pillHeight"] : 52.0;
+    CGFloat inset = [d objectForKey:@"pillInset"] ? (CGFloat)[d doubleForKey:@"pillInset"] : 16.0;
+    self.springPct = [d objectForKey:@"springPct"] ? (CGFloat)[d doubleForKey:@"springPct"] : 55.0;
+    self.stretchPct = [d objectForKey:@"stretchPct"] ? (CGFloat)[d doubleForKey:@"stretchPct"] : 50.0;
+    self.touchScalePct = [d objectForKey:@"touchScalePct"] ? (CGFloat)[d doubleForKey:@"touchScalePct"] : 104.0;
     self.hapticsEnabled = [d objectForKey:@"haptics"] ? [d boolForKey:@"haptics"] : YES;
 
     NSString *hash = [NSString stringWithFormat:@"%@|%@|%@|%.2f|%.2f|%.0f|%.0f|%.0f|%.0f|%ld|%@",
@@ -303,18 +311,18 @@ static void LGCPreviewPrefsChanged(CFNotificationCenterRef center, void *observe
 
     self.hintLabel.frame = CGRectMake(12, 8, stage.size.width - 24, 16);
 
-    self.circleA.frame = CGRectMake(stage.size.width * 0.04, stage.size.height - 96, 86, 86);
-    self.circleA.layer.cornerRadius = 43;
-    self.circleB.frame = CGRectMake(stage.size.width * 0.74, stage.size.height - 104, 78, 78);
-    self.circleB.layer.cornerRadius = 39;
-    self.bgDigitsLabel.frame = CGRectMake(18, stage.size.height - 74, stage.size.width - 24, 28);
+    self.circleA.frame = CGRectMake(stage.size.width * 0.04, stage.size.height - 92, 82, 82);
+    self.circleA.layer.cornerRadius = 41;
+    self.circleB.frame = CGRectMake(stage.size.width * 0.74, stage.size.height - 98, 74, 74);
+    self.circleB.layer.cornerRadius = 37;
+    self.bgDigitsLabel.frame = CGRectMake(18, stage.size.height - 68, stage.size.width - 24, 26);
 
     CGFloat rowW[] = {0.48, 0.66};
     for (NSInteger i = 0; i < 2; i++) {
         self.fakeRows[i].frame = CGRectMake(18, 28 + i * 14, stage.size.width * rowW[i], 8);
     }
 
-    CGFloat clampedPillH = MIN(MAX(pillH, 48.0), 70.0);
+    CGFloat clampedPillH = MIN(MAX(pillH, 40.0), 64.0);
     CGRect pill = CGRectMake(inset, stage.size.height - clampedPillH - 12,
                              stage.size.width - inset * 2, clampedPillH);
     self.currentPillRect = pill;
@@ -323,7 +331,7 @@ static void LGCPreviewPrefsChanged(CFNotificationCenterRef center, void *observe
     self.pillFx.layer.cornerRadius = clampedPillH / 2.0;
     self.pillFx.alpha = glassAlpha;
     self.pillTint.frame = self.pillFx.bounds;
-    self.pillTint.backgroundColor = [tintColor colorWithAlphaComponent:0.24];
+    self.pillTint.backgroundColor = [tintColor colorWithAlphaComponent:0.22];
 
     self.pillAsset.frame = pill;
     self.pillAsset.image = LGCGlassImageForSize(pill.size, NO);
@@ -331,12 +339,12 @@ static void LGCPreviewPrefsChanged(CFNotificationCenterRef center, void *observe
 
     NSInteger n = 4;
     CGFloat slotW = pill.size.width / n;
-    CGFloat contentH = 38;
+    CGFloat contentH = 34;
     CGFloat contentY = CGRectGetMidY(pill) - contentH / 2.0;
     for (NSInteger i = 0; i < n; i++) {
         CGFloat cx = CGRectGetMinX(pill) + slotW * (i + 0.5);
-        self.iconViews[i].frame = CGRectMake(cx - 14, contentY, 28, 23);
-        self.labelViews[i].frame = CGRectMake(CGRectGetMinX(pill) + slotW * i, contentY + 25, slotW, 13);
+        self.iconViews[i].frame = CGRectMake(cx - 13, contentY, 26, 20);
+        self.labelViews[i].frame = CGRectMake(CGRectGetMinX(pill) + slotW * i, contentY + 22, slotW, 12);
     }
 
     NSInteger activeIdx = (self.hoverIndex >= 0) ? self.hoverIndex : self.selectedIndex;
@@ -346,20 +354,64 @@ static void LGCPreviewPrefsChanged(CFNotificationCenterRef center, void *observe
         CGRect blob = [self blobFrameForIndex:self.selectedIndex pill:pill wPct:wPct hPct:hPct];
         self.blobContainer.transform = CGAffineTransformIdentity;
         self.blobContainer.frame = blob;
-        self.blobFx.frame = self.blobContainer.bounds;
-        self.blobFx.layer.cornerRadius = blob.size.height / 2.0;
-        self.blobFx.alpha = blobAlpha;
         self.blobAsset.frame = self.blobContainer.bounds;
         self.blobAsset.image = LGCGlassImageForSize(blob.size, YES);
         self.blobAsset.alpha = blobAlpha;
     }
 }
 
-- (void)handlePreviewDrag:(UILongPressGestureRecognizer *)gr {
+- (void)animateToIndex:(NSInteger)targetIdx velocityX:(CGFloat)vx {
     CGRect pill = self.currentPillRect;
     if (pill.size.width < 40) return;
 
-    CGFloat x = [gr locationInView:self.stageView].x;
+    self.selectedIndex = targetIdx;
+    self.hoverIndex = -1;
+    self.lastHash = nil;
+    [self updateItemColorsWithActiveIndex:targetIdx];
+
+    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:LGC_DOMAIN];
+    CGFloat wPct = [d objectForKey:@"blobWidthPct"] ? (CGFloat)[d doubleForKey:@"blobWidthPct"] : 82.0;
+    CGFloat hPct = [d objectForKey:@"blobHeightPct"] ? (CGFloat)[d doubleForKey:@"blobHeightPct"] : 84.0;
+    CGRect target = [self blobFrameForIndex:targetIdx pill:pill wPct:wPct hPct:hPct];
+    CGFloat dx = CGRectGetMidX(target) - CGRectGetMidX(self.blobContainer.frame);
+    CGFloat damping = 1.0 - 0.45 * (self.springPct / 100.0);
+    CGFloat springVel = (fabs(dx) > 1.0) ? MIN(MAX(vx / dx, -3.0), 3.0) : 0.0;
+
+    [UIView animateWithDuration:0.34
+                          delay:0
+         usingSpringWithDamping:damping
+          initialSpringVelocity:springVel
+                        options:(UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionAllowUserInteraction)
+                     animations:^{
+                         self.blobContainer.transform = CGAffineTransformMakeTranslation(dx, 0);
+                     }
+                     completion:^(__unused BOOL finished) {
+                         self.blobContainer.transform = CGAffineTransformIdentity;
+                         self.blobContainer.frame = target;
+                         self.blobAsset.frame = self.blobContainer.bounds;
+                     }];
+}
+
+- (void)handlePreviewTap:(UITapGestureRecognizer *)tap {
+    CGRect pill = self.currentPillRect;
+    if (pill.size.width < 40) return;
+    CGFloat x = [tap locationInView:self.stageView].x;
+    CGFloat slotW = pill.size.width / 4.0;
+    NSInteger idx = MIN(MAX((NSInteger)floor((x - CGRectGetMinX(pill)) / slotW), 0), 3);
+    if (idx != self.selectedIndex) {
+        if (self.hapticsEnabled) {
+            [[[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLight] impactOccurred];
+        }
+        [self animateToIndex:idx velocityX:0];
+    }
+}
+
+- (void)handlePreviewPan:(UIPanGestureRecognizer *)pan {
+    CGRect pill = self.currentPillRect;
+    if (pill.size.width < 40) return;
+
+    CGFloat x = [pan locationInView:self.stageView].x;
+    CGFloat vx = [pan velocityInView:self.stageView].x;
     CGFloat slotW = pill.size.width / 4.0;
     CGFloat minX = CGRectGetMinX(pill) + slotW * 0.5;
     CGFloat maxX = CGRectGetMaxX(pill) - slotW * 0.5;
@@ -368,14 +420,21 @@ static void LGCPreviewPrefsChanged(CFNotificationCenterRef center, void *observe
     NSInteger nearIdx = (NSInteger)floor((clampedX - CGRectGetMinX(pill)) / slotW);
     nearIdx = MIN(MAX(nearIdx, 0), 3);
 
-    switch (gr.state) {
+    switch (pan.state) {
         case UIGestureRecognizerStateBegan: {
             self.isDragging = YES;
-            self.dragStartX = x;
-            self.lastDragX = x;
             self.hoverIndex = nearIdx;
-            [self.blobContainer.layer removeAllAnimations];
-            self.blobContainer.transform = CGAffineTransformIdentity;
+            self.smoothedStretch = 0.0;
+            CALayer *pres = self.blobContainer.layer.presentationLayer;
+            if (pres) {
+                CGRect cur = pres.frame;
+                [self.blobContainer.layer removeAllAnimations];
+                self.blobContainer.transform = CGAffineTransformIdentity;
+                self.blobContainer.frame = cur;
+            } else {
+                [self.blobContainer.layer removeAllAnimations];
+                self.blobContainer.transform = CGAffineTransformIdentity;
+            }
             self.settledCenterX = CGRectGetMidX(self.blobContainer.frame);
             if (nearIdx != self.selectedIndex) {
                 [self updateItemColorsWithActiveIndex:nearIdx];
@@ -387,18 +446,18 @@ static void LGCPreviewPrefsChanged(CFNotificationCenterRef center, void *observe
         }
         case UIGestureRecognizerStateChanged: {
             CGFloat tx = clampedX - self.settledCenterX;
-            CGFloat txMin = CGRectGetMinX(pill) + 3.0 - CGRectGetMinX(self.blobContainer.frame);
-            CGFloat txMax = CGRectGetMaxX(pill) - 3.0 - CGRectGetMaxX(self.blobContainer.frame);
+            CGFloat txMin = CGRectGetMinX(pill) + 4.0 - CGRectGetMinX(self.blobContainer.frame);
+            CGFloat txMax = CGRectGetMaxX(pill) - 4.0 - CGRectGetMaxX(self.blobContainer.frame);
             tx = MIN(MAX(tx, txMin), txMax);
 
-            CGFloat dx = x - self.lastDragX;
-            self.lastDragX = x;
+            CGFloat maxStretch = 0.22 * (self.stretchPct / 100.0);
+            CGFloat targetStretch = (maxStretch > 0.001)
+                ? MIN(maxStretch, (fabs(vx) / 1400.0) * maxStretch) : 0.0;
+            self.smoothedStretch = self.smoothedStretch * 0.65 + targetStretch * 0.35;
+
             CGFloat baseScale = self.touchScalePct / 100.0;
-            CGFloat maxStretch = 0.28 * (self.stretchPct / 100.0);
-            CGFloat stretch = (maxStretch > 0.001)
-                ? MIN(maxStretch, fabs(dx) / 90.0 * (maxStretch / 0.18)) : 0;
-            CGFloat sx = baseScale * (1.0 + stretch);
-            CGFloat sy = baseScale / (1.0 + stretch * 0.50);
+            CGFloat sx = baseScale * (1.0 + self.smoothedStretch);
+            CGFloat sy = baseScale / (1.0 + self.smoothedStretch * 0.45);
 
             CGAffineTransform tr = CGAffineTransformMakeTranslation(tx, 0);
             tr = CGAffineTransformScale(tr, sx, sy);
@@ -416,30 +475,16 @@ static void LGCPreviewPrefsChanged(CFNotificationCenterRef center, void *observe
         case UIGestureRecognizerStateEnded:
         case UIGestureRecognizerStateCancelled: {
             self.isDragging = NO;
-            self.selectedIndex = nearIdx;
-            self.hoverIndex = -1;
-            self.lastHash = nil;
-            [self updateItemColorsWithActiveIndex:nearIdx];
-
-            NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:LGC_DOMAIN];
-            CGFloat wPct = [d objectForKey:@"blobWidthPct"] ? (CGFloat)[d doubleForKey:@"blobWidthPct"] : 104.0;
-            CGFloat hPct = [d objectForKey:@"blobHeightPct"] ? (CGFloat)[d doubleForKey:@"blobHeightPct"] : 92.0;
-            CGRect target = [self blobFrameForIndex:nearIdx pill:pill wPct:wPct hPct:hPct];
-            CGFloat dx = CGRectGetMidX(target) - CGRectGetMidX(self.blobContainer.frame);
-            CGFloat damping = 1.0 - 0.52 * (self.springPct / 100.0);
-
-            [UIView animateWithDuration:0.38 delay:0
-                 usingSpringWithDamping:damping initialSpringVelocity:0.6
-                                options:UIViewAnimationOptionBeginFromCurrentState
-                             animations:^{
-                                 self.blobContainer.transform = CGAffineTransformMakeTranslation(dx, 0);
-                             }
-                             completion:^(__unused BOOL finished) {
-                                 self.blobContainer.transform = CGAffineTransformIdentity;
-                                 self.blobContainer.frame = target;
-                                 self.blobFx.frame = self.blobContainer.bounds;
-                                 self.blobAsset.frame = self.blobContainer.bounds;
-                             }];
+            self.smoothedStretch = 0.0;
+            NSInteger target = nearIdx;
+            if (fabs(vx) > 450.0) {
+                NSInteger dir = (vx > 0) ? 1 : -1;
+                NSInteger stepIdx = MIN(MAX(self.selectedIndex + dir, 0), 3);
+                if (target == self.selectedIndex && stepIdx != self.selectedIndex) {
+                    target = stepIdx;
+                }
+            }
+            [self animateToIndex:target velocityX:vx];
             break;
         }
         default:

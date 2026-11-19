@@ -409,9 +409,9 @@ static BOOL LGBLooksLikeBadge(UIView *v) {
                     UIEdgeInsets inset = sv.contentInset;
                     inset.bottom += gapToBottom;
                     sv.contentInset = inset;
-                    UIEdgeInsets indInset = sv.scrollIndicatorInsets;
+                    UIEdgeInsets indInset = sv.verticalScrollIndicatorInsets;
                     indInset.bottom += gapToBottom;
-                    sv.scrollIndicatorInsets = indInset;
+                    sv.verticalScrollIndicatorInsets = indInset;
                     LGBLog(@"Da mo rong UIScrollView %@ xuong duoi thanh bar (+%.0fpt)", NSStringFromClass([sv class]), gapToBottom);
                 }
             }
